@@ -11,9 +11,9 @@
  * 7. Structured task report and notification generation
  */
 
-import { AgentTask, ExecutionStep, TaskReport, UserNotification, UserProfile, AgentInstruction, DriveKnowledge, ApprovalRequest } from '../types';
-import { generateTaskPlan } from './agent-executor';
-import { browserbaseService } from './browserbase-service';
+import { AgentTask, ExecutionStep, TaskReport, UserNotification, UserProfile, AgentInstruction, DriveKnowledge, ApprovalRequest } from '../types/index.ts';
+import { generateTaskPlan } from './agent-executor.ts';
+import { browserbaseService } from './browserbase-service.ts';
 
 export interface EnqueueTaskOptions {
   taskId: string;
@@ -115,6 +115,9 @@ class BackgroundTaskWorker {
     this.pollInterval = setInterval(() => {
       this.processNextInQueue();
     }, 2000);
+    if (this.pollInterval && typeof (this.pollInterval as any).unref === 'function') {
+      (this.pollInterval as any).unref();
+    }
   }
 
   /**
