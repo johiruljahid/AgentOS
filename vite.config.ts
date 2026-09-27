@@ -21,6 +21,10 @@ function apiDevServerPlugin(): Plugin {
 export default defineConfig(() => {
   return {
     plugins: [react(), tailwindcss(), apiDevServerPlugin()],
+    root: process.cwd(),
+    build: {
+      outDir: 'dist',
+    },
     resolve: {
       alias: {
         '@': path.resolve(process.cwd(), '.'),

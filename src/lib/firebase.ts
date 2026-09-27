@@ -13,13 +13,20 @@ import {
   getDocFromServer,
   Firestore,
 } from 'firebase/firestore';
-import firebaseConfigRaw from '../../firebase-applet-config.json';
 
 // Target database ID explicitly specified in project configuration
 const FIRESTORE_DATABASE_ID = 'ai-studio-398e62da-c125-4781-9f9e-53a1145e861d';
 
 const firebaseConfig = {
-  ...firebaseConfigRaw,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'gen-lang-client-0940395063',
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || '1:741966588549:web:b80b137d3f56256fdb17ec',
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyCCHTlJHml3gLMQ-H38vwyu75XD5w3kgJA',
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'gen-lang-client-0940395063.firebaseapp.com',
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'gen-lang-client-0940395063.firebasestorage.app',
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '741966588549',
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || '',
+  oAuthClientId: import.meta.env.VITE_FIREBASE_OAUTH_CLIENT_ID || '741966588549-amgi5efpbn4ifv58fdm1nkqjoen4aksf.apps.googleusercontent.com',
+  recaptchaSiteKey: import.meta.env.VITE_FIREBASE_RECAPTCHA_SITE_KEY || '',
 };
 
 export const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
