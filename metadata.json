@@ -1,0 +1,6 @@
+{
+  "name": "AgentOS - Autonomous Personal AI Agent",
+  "description": "Multi-user autonomous AI agent platform with Google Workspace integration, Drive knowledge retrieval, and persistent task execution.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

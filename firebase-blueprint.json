@@ -1,0 +1,224 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile data isolated per authenticated user",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "fullName": { "type": "string", "maxLength": 100 },
+        "email": { "type": "string", "maxLength": 100 },
+        "preferredName": { "type": "string", "maxLength": 50 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "location": { "type": "string", "maxLength": 100 },
+        "professionalTitle": { "type": "string", "maxLength": 100 },
+        "bio": { "type": "string", "maxLength": 500 },
+        "skills": { "type": "array" },
+        "preferredLanguage": { "type": "string", "maxLength": 50 },
+        "preferredEmailStyle": { "type": "string", "maxLength": 50 },
+        "preferredCVFileId": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "email"]
+    },
+    "AgentConfig": {
+      "title": "AgentConfig",
+      "description": "Configuration and status of the user's private agent",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "agentName": { "type": "string", "maxLength": 50 },
+        "status": { "type": "string", "enum": ["IDLE", "RUNNING", "WAITING", "OFFLINE"] },
+        "autonomyLevel": { "type": "string", "enum": ["SEMI_AUTONOMOUS", "FULL_AUTONOMOUS"] },
+        "thinkingLevel": { "type": "string", "enum": ["LOW", "HIGH"] },
+        "activeModel": { "type": "string", "maxLength": 60 },
+        "emailNotificationsEnabled": { "type": "boolean" },
+        "autoSaveDriveReports": { "type": "boolean" },
+        "totalTasksExecuted": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "agentName", "status"]
+    },
+    "AgentInstruction": {
+      "title": "AgentInstruction",
+      "description": "User-defined directives and rules for their private agent",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string" },
+        "title": { "type": "string", "maxLength": 120 },
+        "content": { "type": "string", "maxLength": 2000 },
+        "category": { "type": "string", "enum": ["COMMUNICATION", "APPLICATIONS", "PAYMENTS", "CALENDAR", "GENERAL"] },
+        "isActive": { "type": "boolean" },
+        "priority": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "title", "content", "category"]
+    },
+    "AgentMemory": {
+      "title": "AgentMemory",
+      "description": "Learned facts, user preferences, and project context scoped to the user",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string" },
+        "title": { "type": "string", "maxLength": 120 },
+        "category": { "type": "string", "enum": ["PREFERENCE", "WORKFLOW", "FACT", "CONTACT_NOTE"] },
+        "content": { "type": "string", "maxLength": 2000 },
+        "confidence": { "type": "number" },
+        "sourceTaskId": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "title", "category", "content"]
+    },
+    "AgentTask": {
+      "title": "AgentTask",
+      "description": "Autonomous task submitted by user and executed asynchronously on backend",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string" },
+        "command": { "type": "string", "maxLength": 2000 },
+        "title": { "type": "string", "maxLength": 150 },
+        "status": { "type": "string", "enum": ["QUEUED", "PLANNING", "RUNNING", "WAITING_FOR_USER", "COMPLETED", "FAILED", "CANCELLED"] },
+        "progressPercent": { "type": "number" },
+        "currentStep": { "type": "number" },
+        "totalSteps": { "type": "number" },
+        "currentAction": { "type": "string", "maxLength": 300 },
+        "executionPlan": { "type": "array" },
+        "resultSummary": { "type": "string", "maxLength": 3000 },
+        "reportId": { "type": "string", "maxLength": 128 },
+        "waitingReason": { "type": "string", "maxLength": 500 },
+        "waitingType": { "type": "string", "enum": ["PAYMENT", "CAPTCHA", "OTP", "CONFIRMATION"] },
+        "waitingPayload": { "type": "object" },
+        "errorMessage": { "type": "string", "maxLength": 1000 },
+        "toolsUsed": { "type": "array" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "startedAt": { "type": "string", "format": "date-time" },
+        "completedAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "command", "title", "status"]
+    },
+    "TaskReport": {
+      "title": "TaskReport",
+      "description": "Comprehensive report of an executed autonomous task",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string" },
+        "taskId": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 150 },
+        "status": { "type": "string", "enum": ["COMPLETED", "FAILED", "CANCELLED"] },
+        "summary": { "type": "string", "maxLength": 3000 },
+        "details": { "type": "object" },
+        "attachments": { "type": "array" },
+        "googleServicesImpact": { "type": "object" },
+        "nextActions": { "type": "array" },
+        "driveDocUrl": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "completedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "taskId", "title", "status", "summary"]
+    },
+    "UserNotification": {
+      "title": "UserNotification",
+      "description": "In-app notifications for task updates and approvals",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string" },
+        "taskId": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 120 },
+        "message": { "type": "string", "maxLength": 500 },
+        "type": { "type": "string", "enum": ["TASK_COMPLETED", "TASK_FAILED", "USER_ACTION_REQUIRED", "PAYMENT_REQUIRED", "TASK_CANCELLED"] },
+        "isRead": { "type": "boolean" },
+        "link": { "type": "string", "maxLength": 300 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "title", "message", "type", "isRead"]
+    },
+    "DriveKnowledge": {
+      "title": "DriveKnowledge",
+      "description": "Catalog of user's Google Drive files indexed for agent reasoning",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string" },
+        "fileId": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 200 },
+        "mimeType": { "type": "string", "maxLength": 100 },
+        "webViewLink": { "type": "string", "maxLength": 500 },
+        "category": { "type": "string", "enum": ["CV", "CERTIFICATE", "SPREADSHEET", "DOC", "PRESENTATION", "OTHER"] },
+        "sizeBytes": { "type": "number" },
+        "summary": { "type": "string", "maxLength": 1000 },
+        "lastModified": { "type": "string", "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "fileId", "name", "mimeType"]
+    },
+    "ApprovalRequest": {
+      "title": "ApprovalRequest",
+      "description": "Human-in-the-loop approvals for payments and sensitive actions",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string" },
+        "taskId": { "type": "string", "maxLength": 128 },
+        "type": { "type": "string", "enum": ["PAYMENT", "CAPTCHA", "OTP", "CONFIRMATION"] },
+        "title": { "type": "string", "maxLength": 150 },
+        "merchant": { "type": "string", "maxLength": 100 },
+        "amount": { "type": "number" },
+        "currency": { "type": "string", "maxLength": 10 },
+        "purpose": { "type": "string", "maxLength": 300 },
+        "reason": { "type": "string", "maxLength": 500 },
+        "status": { "type": "string", "enum": ["PENDING", "APPROVED", "REJECTED"] },
+        "requestedAt": { "type": "string", "format": "date-time" },
+        "respondedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "taskId", "type", "title", "status"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/profile/main": {
+      "schema": "UserProfile",
+      "description": "Private user profile and personal metadata"
+    },
+    "/users/{userId}/agent/config": {
+      "schema": "AgentConfig",
+      "description": "User's dedicated agent instance settings"
+    },
+    "/users/{userId}/instructions/{instructionId}": {
+      "schema": "AgentInstruction",
+      "description": "User's custom agent instructions and behavioral guidelines"
+    },
+    "/users/{userId}/memory/{memoryId}": {
+      "schema": "AgentMemory",
+      "description": "Private persistent agent memories learned across tasks"
+    },
+    "/users/{userId}/tasks/{taskId}": {
+      "schema": "AgentTask",
+      "description": "Autonomous tasks created by the user"
+    },
+    "/users/{userId}/reports/{reportId}": {
+      "schema": "TaskReport",
+      "description": "Execution reports produced upon task completion"
+    },
+    "/users/{userId}/notifications/{notificationId}": {
+      "schema": "UserNotification",
+      "description": "In-app notifications for task updates"
+    },
+    "/users/{userId}/knowledge/{knowledgeId}": {
+      "schema": "DriveKnowledge",
+      "description": "Indexed Google Drive files and metadata for retrieval"
+    },
+    "/users/{userId}/approvals/{approvalId}": {
+      "schema": "ApprovalRequest",
+      "description": "Pending and past approval items requiring human interaction"
+    }
+  }
+}

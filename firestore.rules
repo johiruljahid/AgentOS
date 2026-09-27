@@ -1,0 +1,143 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. Global Safety Net: Default-deny all access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Connection testing endpoint for health check
+    match /test/connection {
+      allow read: if true;
+    }
+
+    // Tenant-isolated user root
+    match /users/{userId} {
+      allow read, write: if false;
+
+      // Profile Document
+      match /profile/{profileId} {
+        allow read: if isOwner(userId) && isValidId(profileId);
+        allow create: if isOwner(userId) && isValidId(profileId) &&
+          request.resource.data.userId == userId &&
+          request.resource.data.email is string &&
+          request.resource.data.email.size() <= 100;
+        allow update: if isOwner(userId) && isValidId(profileId) &&
+          request.resource.data.userId == userId;
+        allow delete: if isOwner(userId) && isValidId(profileId);
+      }
+
+      // Agent Config
+      match /agent/{configId} {
+        allow read: if isOwner(userId) && isValidId(configId);
+        allow create, update: if isOwner(userId) && isValidId(configId) &&
+          request.resource.data.userId == userId &&
+          request.resource.data.agentName is string &&
+          request.resource.data.agentName.size() <= 50;
+        allow delete: if isOwner(userId) && isValidId(configId);
+      }
+
+      // Agent Instructions
+      match /instructions/{instructionId} {
+        allow read: if isOwner(userId) && isValidId(instructionId);
+        allow create: if isOwner(userId) && isValidId(instructionId) &&
+          request.resource.data.userId == userId &&
+          request.resource.data.title is string &&
+          request.resource.data.title.size() <= 120 &&
+          request.resource.data.content is string &&
+          request.resource.data.content.size() <= 4000;
+        allow update: if isOwner(userId) && isValidId(instructionId) &&
+          request.resource.data.userId == userId;
+        allow delete: if isOwner(userId) && isValidId(instructionId);
+      }
+
+      // Agent Memory
+      match /memory/{memoryId} {
+        allow read: if isOwner(userId) && isValidId(memoryId);
+        allow create: if isOwner(userId) && isValidId(memoryId) &&
+          request.resource.data.userId == userId &&
+          request.resource.data.content is string &&
+          request.resource.data.content.size() <= 4000;
+        allow update: if isOwner(userId) && isValidId(memoryId) &&
+          request.resource.data.userId == userId;
+        allow delete: if isOwner(userId) && isValidId(memoryId);
+      }
+
+      // Tasks Collection
+      match /tasks/{taskId} {
+        allow read: if isOwner(userId) && isValidId(taskId);
+        allow create: if isOwner(userId) && isValidId(taskId) &&
+          request.resource.data.userId == userId &&
+          request.resource.data.command is string &&
+          request.resource.data.command.size() <= 4000 &&
+          request.resource.data.title is string &&
+          request.resource.data.title.size() <= 200;
+        allow update: if isOwner(userId) && isValidId(taskId) &&
+          request.resource.data.userId == userId;
+        allow delete: if isOwner(userId) && isValidId(taskId);
+      }
+
+      // Task Reports
+      match /reports/{reportId} {
+        allow read: if isOwner(userId) && isValidId(reportId);
+        allow create: if isOwner(userId) && isValidId(reportId) &&
+          request.resource.data.userId == userId &&
+          request.resource.data.title is string &&
+          request.resource.data.title.size() <= 200;
+        allow update: if isOwner(userId) && isValidId(reportId) &&
+          request.resource.data.userId == userId;
+        allow delete: if isOwner(userId) && isValidId(reportId);
+      }
+
+      // Notifications
+      match /notifications/{notificationId} {
+        allow read: if isOwner(userId) && isValidId(notificationId);
+        allow create: if isOwner(userId) && isValidId(notificationId) &&
+          request.resource.data.userId == userId &&
+          request.resource.data.message is string &&
+          request.resource.data.message.size() <= 1000;
+        allow update: if isOwner(userId) && isValidId(notificationId) &&
+          request.resource.data.userId == userId;
+        allow delete: if isOwner(userId) && isValidId(notificationId);
+      }
+
+      // Knowledge Base (Indexed Google Drive files)
+      match /knowledge/{knowledgeId} {
+        allow read: if isOwner(userId) && isValidId(knowledgeId);
+        allow create: if isOwner(userId) && isValidId(knowledgeId) &&
+          request.resource.data.userId == userId &&
+          request.resource.data.name is string &&
+          request.resource.data.name.size() <= 300;
+        allow update: if isOwner(userId) && isValidId(knowledgeId) &&
+          request.resource.data.userId == userId;
+        allow delete: if isOwner(userId) && isValidId(knowledgeId);
+      }
+
+      // Approvals (Human-in-the-loop: Payments, CAPTCHA, sensitive triggers)
+      match /approvals/{approvalId} {
+        allow read: if isOwner(userId) && isValidId(approvalId);
+        allow create: if isOwner(userId) && isValidId(approvalId) &&
+          request.resource.data.userId == userId &&
+          request.resource.data.title is string &&
+          request.resource.data.title.size() <= 200;
+        allow update: if isOwner(userId) && isValidId(approvalId) &&
+          request.resource.data.userId == userId;
+        allow delete: if isOwner(userId) && isValidId(approvalId);
+      }
+    }
+  }
+}
