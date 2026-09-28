@@ -189,10 +189,10 @@ function AppContent() {
 
           {/* Auth Options */}
           <div className="flex flex-col items-center gap-3 pt-2">
-            <div className="flex flex-col sm:flex-row items-center gap-3">
+            <div className="flex flex-col items-center gap-3">
               <button
                 onClick={loginWithGoogle}
-                className="py-3 px-6 rounded-2xl bg-white hover:bg-slate-100 text-slate-900 font-semibold text-sm shadow-xl shadow-cyan-500/10 hover:shadow-cyan-500/20 transition-all flex items-center gap-3 active:scale-98 cursor-pointer"
+                className="py-3 px-8 rounded-2xl bg-white hover:bg-slate-100 text-slate-900 font-semibold text-sm shadow-xl shadow-cyan-500/10 hover:shadow-cyan-500/20 transition-all flex items-center gap-3 active:scale-98 cursor-pointer"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path
@@ -214,18 +214,10 @@ function AppContent() {
                 </svg>
                 <span>Continue with Google</span>
               </button>
-
-              <button
-                onClick={loginAsGuest}
-                className="py-3 px-6 rounded-2xl bg-gradient-to-r from-cyan-600 via-indigo-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white font-semibold text-sm shadow-xl shadow-indigo-500/20 transition-all flex items-center gap-2.5 active:scale-98 cursor-pointer border border-cyan-400/30"
-              >
-                <Zap className="w-4 h-4 text-cyan-300" />
-                <span>Launch Agent Operator (Instant Access)</span>
-              </button>
             </div>
 
             <span className="text-[11px] text-slate-500">
-              One-click Google OAuth setup or Instant Access • Cloud Background Daemon Enabled
+              One-click Google OAuth setup • Multi-user Tenant Isolation • Autonomous Background Engine
             </span>
           </div>
 

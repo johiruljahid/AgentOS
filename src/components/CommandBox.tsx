@@ -38,22 +38,22 @@ export const CommandBox: React.FC<CommandBoxProps> = ({
 
   const samplePrompts = [
     {
-      label: 'Job Application Autonomous Run',
+      label: 'Top 5 Hospitals Google Sheet & Doc',
       prompt:
-        'Find 15 relevant biotechnology & laboratory jobs in Germany, compare with my CV in Drive, update my Job Search Google Sheet, prepare personalized application emails, and schedule 7-day follow-ups.',
-      icon: Mail,
+        'Collect verified information on the top 5 international hospitals (specialties, bed capacity, global rating) and input into a newly created Google Sheet and Drive briefing document.',
+      icon: Table,
+    },
+    {
+      label: 'Gmail Meeting Check & Calendar Booking',
+      prompt:
+        'Check today\'s Gmail inbox for meeting requests, inspect my Google Calendar for available free slots, book the consultation, and send a confirmation email with calendar invite to the client.',
+      icon: Calendar,
     },
     {
       label: 'Executive Briefing & Doc Report',
       prompt:
         'Search Google for latest breakthrough news in AI agent architectures, summarize findings into an executive briefing Google Doc in my Drive, and email a summary to me.',
       icon: FileText,
-    },
-    {
-      label: 'Calendar & Appointment Assistant',
-      prompt:
-        'Inspect my Google Calendar for open slots next Tuesday and Wednesday afternoon, compose an invitation draft, and block 2 hours for deep focus work.',
-      icon: Calendar,
     },
   ];
 
