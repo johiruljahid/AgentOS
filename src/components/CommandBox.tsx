@@ -57,15 +57,18 @@ export const CommandBox: React.FC<CommandBoxProps> = ({
     },
   ];
 
-  const handleSubmit = async (e?: React.FormEvent) => {
+  const handleSubmit = async (e?: React.FormEvent, customPrompt?: string) => {
     if (e) e.preventDefault();
-    if (!command.trim() || !user || isSubmitting) return;
+    const taskText = (customPrompt || command).trim();
+    if (!taskText || isSubmitting) return;
+
+    const effectiveUserId = user?.uid || localStorage.getItem('agentos_guest_uid') || 'operator_default';
 
     setIsSubmitting(true);
     try {
       const taskId = await taskRunner.startTask(
-        user.uid,
-        command.trim(),
+        effectiveUserId,
+        taskText,
         accessToken,
         profile,
         instructions,
@@ -76,7 +79,9 @@ export const CommandBox: React.FC<CommandBoxProps> = ({
         }
       );
       setCommand('');
-      if (onTaskStarted) onTaskStarted(taskId);
+      if (onTaskStarted) {
+        onTaskStarted(taskId);
+      }
     } catch (err) {
       console.error('Failed to dispatch agent task:', err);
     } finally {
@@ -242,18 +247,39 @@ export const CommandBox: React.FC<CommandBoxProps> = ({
             {samplePrompts.map((s, idx) => {
               const Icon = s.icon;
               return (
-                <button
+                <div
                   key={idx}
-                  type="button"
-                  onClick={() => setCommand(s.prompt)}
-                  className="p-2.5 rounded-xl bg-slate-800/40 hover:bg-slate-800 border border-slate-800/80 hover:border-slate-700 text-left transition group"
+                  className="p-3 rounded-xl bg-slate-800/40 hover:bg-slate-800/70 border border-slate-800/80 hover:border-slate-700 transition flex flex-col justify-between group"
                 >
-                  <div className="flex items-center gap-2 text-xs font-semibold text-slate-300 group-hover:text-cyan-400 mb-1">
-                    <Icon className="w-3.5 h-3.5 text-indigo-400" />
-                    <span>{s.label}</span>
+                  <div
+                    onClick={() => setCommand(s.prompt)}
+                    className="cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2 text-xs font-semibold text-slate-300 group-hover:text-cyan-400 mb-1">
+                      <Icon className="w-3.5 h-3.5 text-indigo-400" />
+                      <span>{s.label}</span>
+                    </div>
+                    <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">{s.prompt}</p>
                   </div>
-                  <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">{s.prompt}</p>
-                </button>
+                  <div className="pt-2 mt-2 border-t border-slate-800/60 flex items-center justify-between text-[11px]">
+                    <button
+                      type="button"
+                      onClick={() => setCommand(s.prompt)}
+                      className="text-slate-400 hover:text-slate-200"
+                    >
+                      Fill Input
+                    </button>
+                    <button
+                      type="button"
+                      disabled={isSubmitting}
+                      onClick={() => handleSubmit(undefined, s.prompt)}
+                      className="text-cyan-400 hover:text-cyan-300 font-semibold flex items-center gap-1"
+                    >
+                      <span>Run Now</span>
+                      <Send className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
               );
             })}
           </div>

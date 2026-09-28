@@ -82,6 +82,7 @@ export const taskRunner = {
           modelPreference: options?.modelName || 'gemini-3.5-flash',
           highThinking: options?.highThinking || false,
           googleAccessToken: token,
+          userId,
         }),
       });
 
@@ -134,9 +135,17 @@ export const taskRunner = {
           knowledge,
           modelName: options?.modelName || 'gemini-3.5-flash',
           highThinking: options?.highThinking || false,
+          userId,
         }),
       });
-      planData = await planRes.json();
+      if (planRes.ok) {
+        const text = await planRes.text();
+        try {
+          planData = JSON.parse(text);
+        } catch {
+          planData = null;
+        }
+      }
     } catch (e) {
       console.warn('Failed to call planner API, using default plan:', e);
     }

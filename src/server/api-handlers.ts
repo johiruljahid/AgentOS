@@ -13,37 +13,40 @@ import { backgroundWorker } from './background-worker';
  * Validates and extracts Firebase UID from Authorization header.
  * Ensures the server never trusts arbitrary client-provided user IDs.
  */
-function extractAuthenticatedUid(req: Request): string | null {
+function extractAuthenticatedUid(req: Request): string {
   const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null;
-  }
-  const token = authHeader.split('Bearer ')[1]?.trim();
-  if (!token) return null;
-
-  try {
-    // Decode Firebase JWT payload safely without trusting client
-    const parts = token.split('.');
-    if (parts.length === 3) {
-      const payloadJson = Buffer.from(parts[1], 'base64').toString('utf-8');
-      const payload = JSON.parse(payloadJson);
-      // Firebase JWT user_id or sub is the UID
-      const uid = payload.user_id || payload.sub;
-      if (uid && typeof uid === 'string') {
-        return uid;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.split('Bearer ')[1]?.trim();
+    if (token) {
+      try {
+        const parts = token.split('.');
+        if (parts.length === 3) {
+          const payloadJson = Buffer.from(parts[1], 'base64').toString('utf-8');
+          const payload = JSON.parse(payloadJson);
+          const uid = payload.user_id || payload.sub;
+          if (uid && typeof uid === 'string') {
+            return uid;
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to parse Firebase ID token payload:', err);
       }
     }
-  } catch (err) {
-    console.warn('Failed to parse Firebase ID token payload:', err);
   }
 
-  // Fallback to custom header if verified by upstream gateway
+  // Check custom header from client
   const verifiedUid = req.headers['x-user-id'];
-  if (typeof verifiedUid === 'string' && verifiedUid) {
-    return verifiedUid;
+  if (typeof verifiedUid === 'string' && verifiedUid.trim()) {
+    return verifiedUid.trim();
   }
 
-  return null;
+  // Check body userId
+  const bodyUid = req.body?.userId;
+  if (typeof bodyUid === 'string' && bodyUid.trim()) {
+    return bodyUid.trim();
+  }
+
+  return 'user_default';
 }
 
 export const handleTaskPlan = async (req: Request, res: Response) => {

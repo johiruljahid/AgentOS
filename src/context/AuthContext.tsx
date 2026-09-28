@@ -13,6 +13,7 @@ interface AuthContextType {
   isLoading: boolean;
   needsAuth: boolean;
   loginWithGoogle: () => Promise<void>;
+  loginAsGuest: () => Promise<void>;
   signOutUser: () => Promise<void>;
   refreshProfile: () => Promise<void>;
   refreshDriveKnowledge: () => Promise<void>;
@@ -42,7 +43,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
         setIsLoading(false);
       },
-      () => {
+      async () => {
+        const savedGuest = localStorage.getItem('agentos_guest_uid');
+        if (savedGuest) {
+          const guestUser: any = {
+            uid: savedGuest,
+            displayName: 'Agent Operator (Johirul)',
+            email: 'johirul4873@gmail.com',
+            isAnonymous: true,
+            getIdToken: async () => 'operator_token',
+          };
+          setUser(guestUser);
+          setNeedsAuth(false);
+          await loadUserData(guestUser, null);
+          setIsLoading(false);
+          return;
+        }
         setUser(null);
         setToken(null);
         setProfile(null);
@@ -183,9 +199,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const loginAsGuest = async () => {
+    setIsLoading(true);
+    try {
+      let guestUid = localStorage.getItem('agentos_guest_uid');
+      if (!guestUid) {
+        guestUid = `operator_${Math.random().toString(36).substring(2, 9)}`;
+        localStorage.setItem('agentos_guest_uid', guestUid);
+      }
+      const guestUser: any = {
+        uid: guestUid,
+        displayName: 'Agent Operator (Johirul)',
+        email: 'johirul4873@gmail.com',
+        isAnonymous: true,
+        getIdToken: async () => 'operator_token',
+      };
+      setUser(guestUser);
+      setNeedsAuth(false);
+      await loadUserData(guestUser, null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const signOutUser = async () => {
     setIsLoading(true);
     try {
+      localStorage.removeItem('agentos_guest_uid');
       await fbLogout();
       setUser(null);
       setToken(null);
@@ -222,6 +262,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoading,
         needsAuth,
         loginWithGoogle,
+        loginAsGuest,
         signOutUser,
         refreshProfile,
         refreshDriveKnowledge,
