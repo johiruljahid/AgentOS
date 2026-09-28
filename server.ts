@@ -1,7 +1,7 @@
 import express from 'express';
 import path from 'path';
 import 'dotenv/config';
-import { app } from './src/server/app.ts';
+import { app } from './src/server/app';
 
 const PORT = process.env.PORT || 3000;
 

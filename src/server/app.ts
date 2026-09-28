@@ -11,7 +11,7 @@ import {
   handleAnalyzeImage,
   handleGenerateImage,
   handleBrowserAction,
-} from './api-handlers.ts';
+} from './api-handlers';
 
 const app = express();
 

@@ -5,9 +5,9 @@ import {
   executeMapsGrounding,
   analyzeImageWithGemini,
   generateImageWithGemini,
-} from './agent-executor.ts';
-import { browserbaseService } from './browserbase-service.ts';
-import { backgroundWorker } from './background-worker.ts';
+} from './agent-executor';
+import { browserbaseService } from './browserbase-service';
+import { backgroundWorker } from './background-worker';
 
 /**
  * Validates and extracts Firebase UID from Authorization header.

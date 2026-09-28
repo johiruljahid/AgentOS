@@ -1,5 +1,5 @@
 import { GoogleGenAI } from '@google/genai';
-import { AgentTask, ExecutionStep, TaskReport, UserProfile, AgentInstruction, DriveKnowledge } from '../types/index.ts';
+import { AgentTask, ExecutionStep, TaskReport, UserProfile, AgentInstruction, DriveKnowledge } from '../types/index';
 
 // Initialize Gemini client strictly with User-Agent telemetry as mandated by skill
 const ai = new GoogleGenAI({

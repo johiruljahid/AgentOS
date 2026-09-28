@@ -11,9 +11,9 @@
  * 7. Structured task report and notification generation
  */
 
-import { AgentTask, ExecutionStep, TaskReport, UserNotification, UserProfile, AgentInstruction, DriveKnowledge, ApprovalRequest } from '../types/index.ts';
-import { generateTaskPlan } from './agent-executor.ts';
-import { browserbaseService } from './browserbase-service.ts';
+import { AgentTask, ExecutionStep, TaskReport, UserNotification, UserProfile, AgentInstruction, DriveKnowledge, ApprovalRequest } from '../types/index';
+import { generateTaskPlan } from './agent-executor';
+import { browserbaseService } from './browserbase-service';
 
 export interface EnqueueTaskOptions {
   taskId: string;
