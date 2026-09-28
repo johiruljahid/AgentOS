@@ -78,7 +78,25 @@ export const TasksView: React.FC<TasksViewProps> = ({
             onTaskStarted={(taskId) => {
               setShowQuickCommand(false);
               const match = tasks.find((t) => t.id === taskId);
-              if (match) onSelectTask(match);
+              if (match) {
+                onSelectTask(match);
+              } else {
+                onSelectTask({
+                  id: taskId,
+                  userId: 'user',
+                  command: 'Executing agent instructions...',
+                  title: 'Planning autonomous execution...',
+                  status: 'RUNNING',
+                  progressPercent: 15,
+                  currentStep: 1,
+                  totalSteps: 5,
+                  currentAction: 'Decomposing task and initializing Google Workspace engine...',
+                  executionPlan: [],
+                  toolsUsed: [],
+                  createdAt: new Date().toISOString(),
+                  updatedAt: new Date().toISOString(),
+                });
+              }
             }}
             instructions={instructions}
             knowledge={knowledge}

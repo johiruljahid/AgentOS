@@ -168,7 +168,29 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
       {/* Main Command Box */}
       <CommandBox
-        onTaskStarted={() => setActiveView('tasks')}
+        onTaskStarted={(taskId) => {
+          const match = tasks.find((t) => t.id === taskId);
+          if (match) {
+            onSelectTask(match);
+          } else {
+            // Immediate cockpit launch with live placeholder state
+            onSelectTask({
+              id: taskId,
+              userId: profile?.userId || 'user',
+              command: 'Executing agent instructions...',
+              title: 'Planning autonomous execution...',
+              status: 'RUNNING',
+              progressPercent: 15,
+              currentStep: 1,
+              totalSteps: 5,
+              currentAction: 'Initializing Gemini reasoning engine and Google Workspace tools...',
+              executionPlan: [],
+              toolsUsed: [],
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            });
+          }
+        }}
         instructions={instructions}
         knowledge={knowledge}
       />

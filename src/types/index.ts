@@ -173,6 +173,7 @@ export interface ApprovalRequest {
   currency?: string;
   purpose?: string;
   reason?: string;
+  details?: Record<string, any>;
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   requestedAt: string;
   respondedAt?: string;

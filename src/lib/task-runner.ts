@@ -340,8 +340,9 @@ export const taskRunner = {
     }
 
     let createdSpreadsheetId: string | null = null;
+    const startIdx = Math.max(0, steps.findIndex((s) => s.status !== 'COMPLETED'));
 
-    for (let i = 0; i < steps.length; i++) {
+    for (let i = startIdx; i < steps.length; i++) {
       const step = steps[i];
       step.status = 'RUNNING';
       const progress = Math.round(((i + 1) / (steps.length + 1)) * 100);
@@ -353,7 +354,8 @@ export const taskRunner = {
         executionPlan: steps,
       });
 
-      await new Promise((r) => setTimeout(r, 1200));
+      // Realistic cadence for live observability (like Gemini Spark)
+      await new Promise((r) => setTimeout(r, 1600));
 
       const toolLower = step.tool?.toLowerCase() || '';
 
@@ -396,9 +398,46 @@ export const taskRunner = {
           executedActions.push('Accessed Google Drive workspace');
         }
       }
-      // Tool: Gmail Send / Compose / Search
+      // Tool: Gmail Send / Compose / Search (Permission Checkpoint Gate)
       else if (toolLower.includes('gmail') || toolLower.includes('email')) {
         if (isEmailMeetingTask) {
+          const currentDoc = await firestoreService.getTask(userId, taskId);
+          const isApproved = currentDoc?.waitingPayload?.approved === true;
+
+          if (!isApproved) {
+            // Live Permission Gate requested by user
+            const waitingReason = 'Agent needs your authorization: Ready to dispatch client meeting confirmation email and finalize calendar schedule.';
+            const approvalId = `appr_${Date.now()}`;
+            await firestoreService.createApproval(userId, {
+              id: approvalId,
+              userId,
+              taskId,
+              title: 'Authorization Required: Dispatch Client Confirmation Email',
+              reason: waitingReason,
+              type: 'CONFIRMATION',
+              status: 'PENDING',
+              details: {
+                targetAction: 'Send confirmation email & schedule Google Calendar',
+                clientSummary: 'Meeting booked for Tomorrow 2:00 PM CET',
+              },
+              requestedAt: new Date().toISOString(),
+            });
+
+            await firestoreService.updateTask(userId, taskId, {
+              status: 'WAITING_FOR_USER',
+              waitingType: 'CONFIRMATION',
+              waitingReason,
+              waitingPayload: {
+                approved: false,
+                approvalId,
+                action: 'DISPATCH_EMAIL_CALENDAR',
+              },
+              currentAction: 'Paused: Awaiting user authorization in Live Agent Cockpit',
+              executionPlan: steps,
+            });
+            return;
+          }
+
           if (token) {
             try {
               const emails = await googleWorkspace.searchEmails(token, 'meeting OR appointment');
@@ -668,6 +707,7 @@ export const taskRunner = {
     // User approved! Resume execution
     await firestoreService.updateTask(userId, taskId, {
       status: 'RUNNING',
+      waitingPayload: { approved: true },
       currentAction: 'User action confirmed. Resuming autonomous execution...',
     });
 

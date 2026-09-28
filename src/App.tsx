@@ -17,7 +17,7 @@ import {
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { AgentVisual3D } from './components/AgentVisual3D';
-import { TaskDetailModal } from './components/TaskDetailModal';
+import { LiveAgentCockpit } from './components/LiveAgentCockpit';
 import { WaitingApprovalModal } from './components/WaitingApprovalModal';
 import { ReportViewerModal } from './components/ReportViewerModal';
 import { MultimodalStudioModal } from './components/MultimodalStudioModal';
@@ -397,16 +397,16 @@ function AppContent() {
         </main>
       </div>
 
-      {/* Floating Modals */}
+      {/* Floating Live Agent Cockpit (Gemini Spark Style) */}
       {selectedTask && (
-        <TaskDetailModal
+        <LiveAgentCockpit
           task={selectedTask}
           onClose={() => setSelectedTask(null)}
           onCancelTask={handleCancelTask}
           onOpenReport={handleOpenReportById}
-          onOpenApproval={() => {
+          onResolveApproval={(approvalId, approved) => {
             const appr = approvals.find((a) => a.taskId === selectedTask.id);
-            if (appr) setSelectedApproval(appr);
+            handleResolveApproval(appr?.id || approvalId, approved);
           }}
         />
       )}
